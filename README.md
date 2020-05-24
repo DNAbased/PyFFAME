@@ -4,7 +4,7 @@ A tool for extremely quick and customizable design of multi-allelic MPRA (massiv
 
 ## Dependencies
 
-PyFFAME was developed for Unix environments. We suggest running python >= 3.7 on a Ubuntu >= 16.04 machine (or similar). For MongoDB, use version >= 4.0.10.
+PyFFAME was developed for Unix environments. We suggest running python >= 3.7 on a Ubuntu >= 16.04 machine (or similar). 
 
 ### Python packages
 
@@ -77,7 +77,7 @@ When creating features for insertions and deletions, the resulting genomic seque
 
 ### Running the pipeline
 
-Call the script using python3 main.py config.py. Note that the config file and the MongoDB authentication file (if it is used) have to be in the same folder as your terminal and have a .py file extension. The provided exemplary files can be modified according to the user's design.
+Call the script using python3 main.py config.py. Note that the config file has to be in the same folder as your terminal and requires a .py file extension. The provided exemplary files can be modified according to the user's design.
 
 The final designed features each contain a unique ID, created in the following way:
 
@@ -86,7 +86,6 @@ The final designed features each contain a unique ID, created in the following w
 Created output:
 
 File containing the designed features; file containing features which were removed due to additional enzyme restriction sites; log file. 
-
 
 ### Example
 
