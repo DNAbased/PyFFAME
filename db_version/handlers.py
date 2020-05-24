@@ -1,6 +1,7 @@
 import pandas as pd
 import re
 import json
+from pymongo import MongoClient
 from pyfaidx import Fasta
 
 
@@ -403,3 +404,35 @@ class DataHelper:
             content = f.read().splitlines()  # read in file and split into lines
         return content  # add '.strip()'?
 
+
+class MongoHandler:
+    def __init__(self, username, password, host='localhost', port=27017, timeout=2500):
+        self.username = username
+        self.password = password
+        self.client = MongoClient('mongodb://' + self.username + ':' + self.password + '@' + host + ':' + str(port), serverSelectionTimeoutMS=timeout)
+
+    def get_variants(self, id_list, database='dbsnp_b151', collection='rs'):
+        db = self.client[database]  # set database
+        coll = db[collection]  # set collection
+        df = pd.DataFrame(list((coll.find({'ID': {'$in': id_list}}, {'_id': False}))))  # search for all ids at once
+        return df
+
+    def get_single_variant(self, rsID, database='dbsnp_b151', collection='rs'):
+        db = self.client[database]
+        coll = db[collection]
+        return pd.DataFrame(list(coll.find({'ID': rsID}, {'_id': False})))  # return output of single search
+
+    def got_merged(self, id_list, database='dbsnp_b151', collection='merged'):
+        db = self.client[database]
+        coll = db[collection]
+        id_list_mod = [int(i[2:]) for i in id_list]  # create ids suitable for the merged coll
+        df = pd.DataFrame(list((coll.find({'OLD': {'$in': id_list_mod}}, {'_id': False}))))
+        return df
+
+    def get_single_merged(self, rsID, database='dbsnp_b151', collection='merged'):
+        """check a singe variant for 'merged' status"""
+        db = self.client[database]
+        coll = db[collection]
+        simple_ID = int(rsID[2:])
+        merged_df = pd.DataFrame(list(coll.find({'OLD': simple_ID}, {'_id': False})))
+        return merged_df

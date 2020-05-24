@@ -1,5 +1,7 @@
 # PyFFAME (Fast and Flexible Allelic MPRA Designer)
 
+# This version expects you to set up your own variant data base, containing information on variants per rsID. For the non-DB version, check the main repository.
+
 A tool for extremely quick and customizable design of multi-allelic MPRA (massively parallel reporter assays)
 
 ## Dependencies
@@ -10,6 +12,7 @@ PyFFAME was developed for Unix environments. We suggest running python >= 3.7 on
 
 - pandas >= 0.24.2
 - pyfaidx >= 0.5.5.2
+- pymongo >= 3.8.0
 
 Also see the requirements.txt file.
 
@@ -24,18 +27,23 @@ A list of enzymes and (expanded) restriction sites, the basis for the one provid
 
 Download or clone this repository. 
 
-If you wish to set up your own data base containing rsID variant info, see the alternative pipeline in the 'db_version' folder of this repository. 
-
 ## Usage 
 
 Edit the config_file.py file to customize your design. The options are explained here:
 
 | Parameter | Description | Value |
 | --- | --- | --- |
+| in_variant | Path to input file (without header) containing one rsID per line | String (file path) or None |
 | in_vcf | Path to input file in vcf format (columns: CHROM, POS, ID, REF, ALT) | String (file path) or None |
 | in_sequence | Path to input file containing additional sequences (columns: ID, FEATURE_SEQ) | String (file path) or None |
 | in_barcode | Path to input file (without header) containing sufficient barcodes for the planned design | String (file path) |
 | in_barcode_type | File type of barcode input file (json format or plain text with one barcode per line) | 'json' or 'txt' |
+| db_host | Host of your MongoDB database | String |
+| db_port | Port to use for accessing your MongoDB database | Integer |
+| db_timeout | Timeout to use for accessing your MongoDB database | Integer |
+| db_database | Name of your database | String |
+| db_collection_rs | Name of your collection | String |
+| db_auth | Path to MongoDB authentication file (example: mongodb_auth_example.py) | String |
 | db_genome | Path to reference genome file | String |
 | de_order | Design order, given as a string containing the letters 'a' to 'e'; see below for a more in-depth explanation | String |
 | de_seq_1 | First added sequence | String |
@@ -56,7 +64,7 @@ Edit the config_file.py file to customize your design. The options are explained
 | out_format | Output format, json or tab-separated | 'json' or 'tsv' |
 | out_output | Path to designed output | String (file path) |
 
-If no VCF info is supplied (only additional sequences), no genome is necessary. 
+If no rsIDs are supplied (only VCF info and additional sequences), then no MongoDB instance is necessary. If neither rsIDs nor VCF info are supplied (only additional sequences), no genome is necessary. 
 
 Note for single nucleotide variants: the pipeline checks, whether the reference allele for each variants is concordant with the base observed at this position in the genome. If not, the reverse complementary base is checked for concordance. If this reversed base is identical to the genomic position, reference and alternative allele are used reverse complemented. Else the original orientation of the alleles is preserved.
 
@@ -87,10 +95,35 @@ Created output:
 
 File containing the designed features; file containing features which were removed due to additional enzyme restriction sites; log file. 
 
+### Setting up your own variant database instance using mongoDB
+
+This pipeline allows the retrieval of variant information based on rsIDs from a personal variant database instance. This is a useful alternative to dbSNP's batch query, which is expected to be discontinued (see https://ncbiinsights.ncbi.nlm.nih.gov/2017/07/07/dbsnp-redesign-supports-future-data-expansion/?campaign=announce-07072017 for more information). 
+
+We here describe a simple way of setting up such a personal variant database ('$' denotes shell commands; '>' denotes mongodb commands). The dbSNP file containing all rsID information (file format: All_YYYYMMDD.vcf.gz, e.g. All_20180423.vcf.gz) and a file containing its MD5 sum are available via the NCBI FTP server: 
+
+ftp://ftp.ncbi.nih.gov/snp/organisms/human_9606_b151_GRCh37p13/VCF/
+
+The file follows the standard Variant Call Format. However, we only need the first five columns of this file (chromosome, position, rsID, reference allele, alternative allele).:
+```
+$ zcat All_20180423.vcf.gz | tail -n +58 | cut -f6,7,8 --complement > All_20180423_abridged.tsv
+```
+This file can then be loaded into the database:
+```
+$ mongoimport -d dbsnp_b151 -c rs --type tsv --file All_20180423_abridged.tsv --fields CHROM,POS,ID,REF,ALT --numInsertionWorkers 10
+```
+To increase the access speed, an index for this database on the rsID should be created:
+```
+$ mongo
+```
+```
+> use dbsnp_b151
+> db.rs.createIndex( {ID: 1} )
+```
+The database is now ready for use. 
 
 ### Example
 
-Example files (rsID input (for the DB-version), VCF input, additional sequences input) are contained in the example_files folder. The config.py contained in this repository can be used with these files. 
+Example files (rsID input, VCF input, additional sequences input) are contained in the example_files folder. The config.py contained in this repository can be used with these files. 
 
 ## Barcodes
 

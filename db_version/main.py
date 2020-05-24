@@ -3,7 +3,7 @@ def main():
     import sys
     import importlib
     import logging
-    from handlers import BarcodeHandler, EnzymeHandler, GenomicHandler, DataHelper
+    from handlers import BarcodeHandler, EnzymeHandler, GenomicHandler, DataHelper, MongoHandler
 
     config_file = importlib.import_module(sys.argv[1][0:-3])
 
@@ -24,8 +24,21 @@ def main():
     logger.info('---MPRA design initiated---')
     logger.info('Used config file: ' + str(sys.argv[1]))
 
-    # read in rs input file and obtain respective info # only in DB-version
-    rs_df = pd.DataFrame()
+    # read in rs input file and obtain respective info
+    if config_file.in_variant is not None:
+        mongodb_auth = importlib.import_module(config_file.db_auth[0:-3])
+        mh = MongoHandler(username=mongodb_auth.username, password=mongodb_auth.password)
+        logger.info('-Reading in rsID input file-')
+        rs_variants = dh.read_list(config_file.in_variant)
+        logger.info('Total rsID variants: ' + f'{len(rs_variants):,}')
+        logger.info('-Getting rsID variant info-')
+        rs_df = mh.get_variants(rs_variants, database=config_file.db_database, collection=config_file.db_collection_rs)
+        logger.info('Obtained rsID variant info for ' + f'{len(rs_df):,}' + ' variants')
+        # for now: drop 'RV' column (if it exists; might be excluded while setting up the database)
+        if 'RV' in rs_df.columns:
+            rs_df = rs_df.drop(labels='RV', axis=1)
+    else:
+        rs_df = pd.DataFrame()
 
     # read in vcf input file
     if config_file.in_vcf is not None:

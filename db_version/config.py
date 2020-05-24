@@ -2,6 +2,8 @@
 # has to be in the same folder as the shell
 
 # INPUT
+# input file containing rsIDs
+in_variant = './example_files/01_input_rs.txt'
 # input file in vcf format
 in_vcf = './example_files/02_input_vcf.txt'
 # input file containing finished sequences
@@ -11,6 +13,15 @@ in_barcode = './barcodes/barcodes.nt12.filtered.dist_3.json'
 # barcode file type [txt (list/tsv), json]?
 in_barcode_type = 'json'
 
+# DATABASE
+db_host = 'localhost'
+db_port = 27017
+db_timeout = 2500
+db_database = 'dbsnp_b151'
+# 'standard' variants
+db_collection_rs = 'rs'
+# authentication file # has to be in the current shell directory
+db_auth = 'mongodb_auth.py'
 # genome for use with pyfaidx.Fasta()
 db_genome = './hs37d5.fa'
 
