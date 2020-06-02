@@ -15,7 +15,7 @@ Also see the requirements.txt file.
 
 ### Further required data
 
-A reference genome in FASTA format. For example, the GRCh37 (hg19) reference genome can be found here [ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/technical/reference/phase2_reference_assembly_sequence/hs37d5.fa.gz].
+A reference genome in FASTA format. For example, the GRCh37 (hg19) reference genome can be found here [ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/technical/reference/phase2_reference_assembly_sequence/hs37d5.fa.gz]. Running the pipeline for the first time generates and index of this .fa file (.fai file). This increases running time but only has to be done once. 
 
 A list of enzymes and (expanded) restriction sites, the basis for the one provided in this repository can be found here [ftp://ftp.neb.com/pub/rebase/itype2.txt]. These enzymes and restriction sites are based on REBASE data:
 > Richard J Roberts, Tamas Vincze, Janos Posfai, Dana Macelis, REBASE--a database for DNA restriction and modification: enzymes, genes and genomes, _Nucleic Acids Res_, Volume 43, 05 November 2014, Pages D298-D299, https://doi.org/10.1093/nar/gku1046
