@@ -2,6 +2,8 @@
 
 A tool for extremely quick and customizable design of multi-allelic MPRA (massively parallel reporter assays)
 
+**You can find PyFFAME's documentation [here](https://pyffame.readthedocs.io/en/latest/)**
+
 ## Dependencies
 
 PyFFAME was developed for Unix environments. We suggest running python >= 3.7 on a Ubuntu >= 16.04 machine (or similar). 
