@@ -1,13 +1,11 @@
 library(shiny)
+library(shinyBS)
 
 ui <- fluidPage(
   
   titlePanel("Hello!"),
-  
   sidebarLayout(
-    
     sidebarPanel(
-      
       actionButton("create_file", 
                    "Create config file", 
                    class = "btn-primary"),
@@ -15,55 +13,71 @@ ui <- fluidPage(
       downloadButton("download_file", 
                    "Download config file", 
                    class = "btn-primary")
-      
     ),
-    
     mainPanel(
-      
       textInput("in_vcf", "VCF-like input file"),
+      bsTooltip("in_vcf", "Path to input file in vcf format (columns: CHROM, POS, ID, REF, ALT); leave blank if none is used."),
       textInput("in_sequence", "Sequence input file"),
+      bsTooltip("in_sequence", "Path to input file containing additional sequences (columns: ID, FEATURE_SEQ); leave blank if none is used."),
       textInput("in_barcode", "Barcode input file"),
+      bsTooltip("in_barcode", "Path to input file (without header) containing sufficient barcodes for the planned design."),
       radioButtons("in_barcode_type", "Barcode input file type",
                   choices=c(".json", ".txt")),
-      textInput("db_genome", "Genome input"),
-      textInput("de_order", "Design order",
-                placeholder="abcde"),
+      bsTooltip("in_barcode_type", "File type of barcode input file (json format or plain text with one barcode per line)."),
+      textInput("db_genome", "Genome input file"),
+      bsTooltip("db_genome", "Path to reference genome file"),
+      textInput("de_order", "Design order"),
+      bsTooltip("de_order", "Design order, given as a string containing the letters 'a' to 'e' (e.g. abcde); see readme for a more in-depth explanation."),
       textInput("de_seq_1", "Added sequence 1"),
+      bsTooltip("de_seq_1", "First added sequence."),
       textInput("de_seq_2", "Added sequence 2"),
+      bsTooltip("de_seq_2", "Second added sequence."),
       textInput("de_seq_3", "Added sequence 3"),
+      bsTooltip("de_seq_3", "Third added sequence."),
       numericInput("set_feature_size", "Feature size per side",
                    value=85),
+      bsTooltip("set_feature_size", "Nucleotides to add to each side of the variant (e.g., 85 will yield a total feature size of 171 nt)."),
       radioButtons("set_all_features", "Create all allelic features?",
                    choices=c("Yes", "No")),
+      bsTooltip("set_all_features", "Create all features (ref/alt) or only those for the reference alleles?"),
       numericInput("set_indel_max_length", "Discard indels larger than this",
                    value=10),
+      bsTooltip("set_indel_max_length", "Maximum length of indels to include (indels exceeding this size will be removed)."),
       radioButtons("set_indel_features", "Only create full-length features",
                    choices=c("Yes", "No"), selected="No"),
+      bsTooltip("set_indel_features", "Only create full-length indel features or create additional features accounting for the size difference? See readme for a more in-depth explanation."),
       numericInput("set_barcodes_per_feature", "Barcodes added to each feature",
                    value=100),
+      bsTooltip("set_barcodes_per_feature", "Number of barcodes to use per feature."),
       radioButtons("set_rev_comp", "Create reverse complementary versions of all features",
                    choices=c("Yes", "No"), selected="No"),
+      bsTooltip("set_rev_comp", "Create reverse complementary versions of all features?"),
       textInput("enz_file_processed", "Enzyme file (processed)"),
+      bsTooltip("enz_file_processed", "Path to processed enzyme file (columns: enzymes, site, expanded_sites)."),
       textInput("enz_file", "Enzyme file (NEB REBASE format)"),
-      textInput("enz_used", "All enzymes used",
-                placeholder="EcoRI,SbfI"),
-      textInput("enz_sites", "OR: all relevant cut sites (DOUBLE QUOTES)",
-                placeholder="['GAATTC', 'CCTGCAGG']"),
+      bsTooltip("enz_file", "Path to REBASE enzyme file (ignored if processed file used)."),
+      textInput("enz_used", "All enzymes used"),
+      bsTooltip("enz_used", "Enzymes used, comma-delimited (e.g. EcoRI, SbfI)."),
+      textInput("enz_sites", "OR: all relevant cut sites (DOUBLE QUOTES)"),
+      bsTooltip("enz_sites", "Expanded cut sites, python dictionary (e.g., ['GAATTC', 'CCTGCAGG'])."),
       numericInput("enz_cumul_cuts", "Total restriction sites expected",
                    value=2),
+      bsTooltip("enz_cumul_cuts", "Total restriction sites expected in final feature."),
       numericInput("enz_cumul_cuts_bc", "Total restriction sites expected (in barcode plus the sequence before and after it)",
                    value=2),
+      bsTooltip("enz_cumul_cuts_bc", "Total restriction sites expected in (barcode plus sequences right before and after it; used to screen the barcodes for excess restriction sites)."),
       radioButtons("out_format", "Output format",
                    choices=c(".json", ".tsv")),
-      textInput("out_output", "Output file path")
-      
+      bsTooltip("out_format", "Output format, json or tab-separated."),
+      textInput("out_output", "Output file path"),
+      bsTooltip("out_output", "Path to designed output."),
+      tags$hr(),
+      tags$hr()
     )
   )
 )
 
-
 server <- function(input, output) {
-  
   observeEvent(input$create_file, {
     #write("test = 'bla'\ntest2 = 'bla2'", "../z_testing.txt")
     in_vcf = ifelse(input$in_vcf == "", "None", paste0("'", input$in_vcf, "'"))
@@ -115,10 +129,9 @@ server <- function(input, output) {
                           "\nout_output = ", out_output)
     write(final_output, "../config.py")
   })
+  
   output$download_file = downloadHandler(filename=function(){paste0("config.py")},
                                          content=function(filename){file.copy("../config.py", filename)})
-  
 }
 
 shinyApp(ui, server)
-
