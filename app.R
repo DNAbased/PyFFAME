@@ -1,9 +1,15 @@
-library(shiny)
-library(shinyBS)
+if(!require(shiny)){
+    install.packages("shiny")
+    library(shiny)
+}
+if(!require(shinyBS)){
+    install.packages("shinyBS")
+    library(shinyBS)
+}
 
 ui <- fluidPage(
   
-  titlePanel("Hello!"),
+  titlePanel("PyFFAME config file creator"),
   sidebarLayout(
     sidebarPanel(
       actionButton("create_file", 
@@ -127,11 +133,11 @@ server <- function(input, output) {
                           "\nenz_cumul_cuts_bc = ", enz_cumul_cuts_bc,
                           "\nout_format = ", out_format,
                           "\nout_output = ", out_output)
-    write(final_output, "../config.py")
+    write(final_output, "config_shiny.py")
   })
   
-  output$download_file = downloadHandler(filename=function(){paste0("config.py")},
-                                         content=function(filename){file.copy("../config.py", filename)})
+  output$download_file = downloadHandler(filename=function(){paste0("config_shiny.py")},
+                                         content=function(filename){file.copy("config_shiny.py", filename)})
 }
 
 shinyApp(ui, server)
