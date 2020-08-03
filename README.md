@@ -2,7 +2,7 @@
 
 A tool for extremely quick and customizable design of multi-allelic MPRA (massively parallel reporter assays)
 
-**You can find PyFFAME's documentation [here](https://pyffame.readthedocs.io/en/latest/)**
+**You can find PyFFAME's documentation [here](https://pyffame.readthedocs.io/en/latest/)** (WIP)
 
 ## Dependencies
 
@@ -17,9 +17,9 @@ Also see the requirements.txt file.
 
 ### Further required data
 
-A reference genome in FASTA format. For example, the GRCh37 (hg19) reference genome can be found here [ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/technical/reference/phase2_reference_assembly_sequence/hs37d5.fa.gz]. Running the pipeline for the first time generates and index of this .fa file (.fai file). This increases running time but only has to be done once. 
+A reference genome in FASTA format. For example, the GRCh37 (hg19) reference genome can be found here [ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/technical/reference/phase2_reference_assembly_sequence/hs37d5.fa.gz]. Running the pipeline for the first time generates an index of this .fa file (i.e. a .fai file). This increases running time but only has to be done once. 
 
-A list of enzymes and (expanded) restriction sites, the basis for the one provided in this repository can be found here [ftp://ftp.neb.com/pub/rebase/itype2.txt]. These enzymes and restriction sites are based on REBASE data:
+A list of enzymes and (expanded) restriction sites, the basis for the one provided in this repository can be found here [ftp://ftp.neb.com/pub/rebase/itype2.txt]. These enzymes and restriction sites are based on up-to-date REBASE data:
 > Richard J Roberts, Tamas Vincze, Janos Posfai, Dana Macelis, REBASE--a database for DNA restriction and modification: enzymes, genes and genomes, _Nucleic Acids Res_, Volume 43, 05 November 2014, Pages D298-D299, https://doi.org/10.1093/nar/gku1046
 
 ## Installation
@@ -30,7 +30,11 @@ If you wish to set up your own data base containing rsID variant info, see the a
 
 ## Usage 
 
-Edit the config_file.py file to customize your design. The options are explained here:
+Edit the config_file.py file to customize your design. 
+
+Alternatively, run the shiny App (app.R) for an interactive config file creator. This app will ask you for all necessary information and create a PyFFAME-compatible config file.
+
+The following options are available:
 
 | Parameter | Description | Value |
 | --- | --- | --- |
@@ -71,7 +75,7 @@ This parameter facilitates flexible combinations of the designed feature. As men
 - d: barcode (as provided in the in_barcode file parameter)
 - e: third added sequence (parameter de_seq_3)
 
-An example (and the config default) would be 'abcde', resulting in the following final feature: (first added sequence)-(feature)-(second added sequence)-(barcode)-(third added sequence)
+An example (and the default) would be 'abcde', resulting in the following final feature: (first added sequence)-(feature)-(second added sequence)-(barcode)-(third added sequence)
 If subsequences are not required for a design, the corresponding letter can be omitted.
 
 ### Further information regarding features created for insertions and deletions (parameter set_indel_features):
@@ -79,7 +83,7 @@ When creating features for insertions and deletions, the resulting genomic seque
 
 ### Running the pipeline
 
-Call the script using python3 main.py config.py. Note that the config file has to be in the same folder as your terminal and requires a .py file extension. The provided exemplary files can be modified according to the user's design.
+Call the script using python3 main.py config.py. Note that the config file has to be in the same folder as your terminal and requires a .py file extension. The provided exemplary files can be modified according to the your design.
 
 The final designed features each contain a unique ID, created in the following way:
 
@@ -95,7 +99,7 @@ Example files (rsID input (for the DB-version), VCF input, additional sequences 
 
 ## Barcodes
 
-Barcodes can be supplied by the user. Alternatively, the companion tool PyBarcodes (https://github.com/DNAbased/PyBarcodes) can be used to generate barcodes based on custom parameters.
+Barcodes can be supplied by you. Alternatively, you can use the companion tool PyBarcodes (https://github.com/DNAbased/PyBarcodes) to generate barcodes based on custom parameters.
 
 The following sets of barcodes are already provided in json format:
 
